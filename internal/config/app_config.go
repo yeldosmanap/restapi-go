@@ -1,7 +1,6 @@
 package config
 
 import (
-	"os"
 	"time"
 
 	"github.com/spf13/viper"
@@ -14,22 +13,14 @@ const (
 type (
 	Config struct {
 		Environment string
-		Mongo       MongoConfig
 		HTTP        HTTPConfig
 		Auth        AuthConfig
 	}
 
-	MongoConfig struct {
-		URI      string
-		User     string
-		Password string
-		Name     string `mapstructure:"databaseName"`
-	}
-
 	AuthConfig struct {
 		JWT                    JWTConfig
-		PasswordSalt           string
-		VerificationCodeLength int `mapstructure:"verificationCodeLength"`
+		PasswordSalt           string `mapstructure:"passwordSalt"`
+		VerificationCodeLength int    `mapstructure:"verificationCodeLength"`
 	}
 
 	JWTConfig struct {
@@ -48,7 +39,12 @@ type (
 )
 
 func Init(configsDir string) (*Config, error) {
-	if err := parseConfigFile(configsDir, os.Getenv("APP_ENV")); err != nil {
+	viper.SetConfigFile(".env")
+	if err := viper.ReadInConfig(); err != nil {
+		return nil, err
+	}
+
+	if err := parseConfigFile(configsDir, viper.GetString("APP_ENV")); err != nil {
 		return nil, err
 	}
 
@@ -56,8 +52,6 @@ func Init(configsDir string) (*Config, error) {
 	if err := unmarshal(&cfg); err != nil {
 		return nil, err
 	}
-
-	setFromEnv(&cfg)
 
 	return &cfg, nil
 }
@@ -67,25 +61,10 @@ func unmarshal(cfg *Config) error {
 		return err
 	}
 
-	if err := viper.UnmarshalKey("auth", &cfg.Auth.JWT); err != nil {
-		return err
-	}
-
-	return viper.UnmarshalKey("mongo", &cfg.Mongo)
+	return viper.UnmarshalKey("auth", &cfg.Auth.JWT)
 }
 
-func setFromEnv(cfg *Config) {
-	cfg.Mongo.URI = os.Getenv("MONGO_URI")
-	cfg.Mongo.Password = os.Getenv("MONGO_PASS")
-	cfg.Mongo.User = os.Getenv("MONGO_USERNAME")
-
-	cfg.HTTP.Host = os.Getenv("HTTP_HOST")
-
-	cfg.Auth.PasswordSalt = os.Getenv("PASSWORD_SALT")
-	cfg.Auth.JWT.SigningKey = os.Getenv("JWT_SIGNING_KEY")
-}
-
-func parseConfigFile(folder, env string) error {
+func parseConfigFile(folder, fileName string) error {
 	viper.AddConfigPath(folder)
 	viper.SetConfigName("config")
 
@@ -93,11 +72,11 @@ func parseConfigFile(folder, env string) error {
 		return err
 	}
 
-	if env == EnvLocal {
+	if fileName == EnvLocal {
 		return nil
 	}
 
-	viper.SetConfigName(env)
+	viper.SetConfigName(fileName)
 
 	return viper.MergeInConfig()
 }

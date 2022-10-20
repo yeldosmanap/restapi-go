@@ -10,10 +10,10 @@ import (
 
 type Authorization interface {
 	CreateUser(ctx context.Context, user model.User) (string, error)
-	GetUser(ctx context.Context, username, password string) (model.User, error)
-	GetById(ctx context.Context, id string) (model.User, error)
-	GetByEmail(ctx context.Context, email string) (model.User, error)
-	GetAll(ctx context.Context) ([]model.User, error)
+	GetUser(ctx context.Context, username, password string) (*model.User, error)
+	GetById(ctx context.Context, id string) (*model.User, error)
+	GetByEmail(ctx context.Context, email string) (*model.User, error)
+	GetAll(ctx context.Context) (*[]model.User, error)
 }
 
 type Projects interface {

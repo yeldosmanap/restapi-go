@@ -5,6 +5,8 @@ import (
 	"errors"
 	"time"
 
+	"github.com/spf13/viper"
+
 	"gorest-api/internal/logs"
 
 	"go.mongodb.org/mongo-driver/mongo"
@@ -13,32 +15,45 @@ import (
 
 const timeout = 10 * time.Second
 
-func NewClient(uri, username, password string) (*mongo.Client, error) {
-	opts := options.Client().ApplyURI(uri)
+type MongoConfig struct {
+	URI      string `mapstructure:"mongoURI"`
+	Username string `mapstructure:"mongoUsername"`
+	Password string `mapstructure:"mongoUrPassword"`
+	Name     string `mapstructure:"databaseName"`
+}
 
-	if username != "" && password != "" {
-		opts.SetAuth(
-			options.Credential{
-				Username: username,
-				Password: password,
-			})
-	}
+func MongoNewClient(ctx context.Context, cancel context.CancelFunc, mongoCfg *MongoConfig) (*mongo.Client, error) {
+	viper.AddConfigPath("configs")
+	viper.SetConfigName("config")
 
-	logs.Log().Info("Enabling new client")
-	client, err := mongo.NewClient(opts)
+	err := viper.UnmarshalKey("mongo", &mongoCfg)
 	if err != nil {
 		return nil, err
 	}
 
-	logs.Log().Info("Enabling context")
-	ctx, cancel := context.WithTimeout(context.Background(), timeout)
-	defer cancel()
+	opts := options.Client().ApplyURI(mongoCfg.URI)
+
+	if mongoCfg.Username != "" && mongoCfg.Password != "" {
+		opts.SetAuth(
+			options.Credential{
+				Username: mongoCfg.Username,
+				Password: mongoCfg.Password,
+			})
+	}
+
+	logs.Log().Info("Enabling new mongodb client")
+	client, err := mongo.NewClient(opts)
+	if err != nil {
+		return nil, err
+	}
 
 	logs.Log().Info("Connecting to the database")
 	err = client.Connect(ctx)
 	if err != nil {
 		return nil, err
 	}
+
+	defer cancel()
 
 	logs.Log().Info("Pinging the database")
 	err = client.Ping(context.Background(), nil)
@@ -51,6 +66,7 @@ func NewClient(uri, username, password string) (*mongo.Client, error) {
 
 func IsDuplicate(err error) bool {
 	var e mongo.WriteException
+
 	if errors.As(err, &e) {
 		for _, we := range e.WriteErrors {
 			if we.Code == 11000 {

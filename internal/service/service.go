@@ -19,7 +19,7 @@ type Authorization interface {
 }
 
 type Projects interface {
-	Create(ctx context.Context, userId string, dto dto.CreateProjectDto) (string, error)
+	Create(ctx context.Context, userId string, dto dto.CreateProjectRequest) (string, error)
 	Update(ctx context.Context, userId string, projectId string, newTitle string) error
 	Delete(ctx context.Context, userId string, projectId string) error
 	GetByTitle(ctx context.Context, userId string, title string) (model.Project, error)

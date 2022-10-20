@@ -2,10 +2,10 @@ package service
 
 import (
 	"context"
-	"crypto/sha1"
 	"errors"
-	"fmt"
 	"time"
+
+	"golang.org/x/crypto/bcrypt"
 
 	"gorest-api/internal/logs"
 
@@ -16,7 +16,6 @@ import (
 )
 
 const (
-	salt       = "hjqrhjqw124617ajfhajs"
 	signingKey = "qrkjk#4#%35FSFJlja#4353KSFjH"
 	tokenTTL   = 24 * time.Hour
 )
@@ -36,17 +35,18 @@ func NewAuthService(repo repository.Authorization) *AuthService {
 
 func (s *AuthService) CreateUser(ctx context.Context, user model.User) (string, error) {
 	logs.Log().Info("Creating a user...")
+
 	user.Password = generatePasswordHash(user.Password)
+
 	return s.repo.CreateUser(ctx, user)
 }
 
 func (s *AuthService) GenerateToken(ctx context.Context, email, password string) (string, error) {
 	logs.Log().Info("Generating a token...")
 
-	user, err := s.repo.GetUser(ctx, email, generatePasswordHash(password))
-
+	user, err := s.repo.GetUser(ctx, email, password)
 	if err != nil {
-		logs.Log().Info("Error happened: %s", err.Error())
+		logs.Log().Warn("Error happened: %s", err.Error())
 		return "", err
 	}
 
@@ -82,8 +82,10 @@ func (s *AuthService) ParseToken(accessToken string) (string, error) {
 }
 
 func generatePasswordHash(password string) string {
-	hash := sha1.New()
-	hash.Write([]byte(password))
+	bytes, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		logs.Log().Fatalf("Error occured when generating a hash of a password")
+	}
 
-	return fmt.Sprintf("%x", hash.Sum([]byte(salt)))
+	return string(bytes)
 }

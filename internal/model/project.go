@@ -6,9 +6,9 @@ import (
 
 type Project struct {
 	Id       *string `json:"id" bson:"_id,omitempty"`
-	Title    string `json:"title"  bson:"title"`
-	Archived bool   `json:"archived" bson:"archived"`
-	UserID   string `json:"-" bson:"user_id"`
+	Title    string  `json:"title"  bson:"title" validate:"min=2"`
+	Archived bool    `json:"archived" bson:"archived"`
+	UserID   string  `json:"-" bson:"user_id"`
 }
 
 func (p *Project) Archive() {

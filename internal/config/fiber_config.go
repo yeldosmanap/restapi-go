@@ -1,14 +1,12 @@
 package config
 
 import (
-	"time"
-
 	"github.com/gofiber/fiber/v2"
 )
 
-func FiberConfig() fiber.Config {
+func FiberConfig(appCfg *Config) fiber.Config {
 	return fiber.Config{
-		ReadTimeout:  time.Second * 3,
-		WriteTimeout: time.Second * 3,
+		ReadTimeout:  appCfg.HTTP.ReadTimeout,
+		WriteTimeout: appCfg.HTTP.WriteTimeout,
 	}
 }

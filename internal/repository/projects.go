@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 
+	"gorest-api/internal/apperror"
 	"gorest-api/internal/config"
 	"gorest-api/internal/logs"
 	"gorest-api/internal/model"
@@ -31,7 +32,7 @@ func (r *ProjectsDatabaseMongo) Create(ctx context.Context, project model.Projec
 	if config.IsDuplicate(err) {
 		logs.Log().Errorf("Duplicate project found %s", err.Error())
 		id := primitive.NilObjectID.Hex()
-		return id, model.ErrProjectIsAlreadyExists
+		return id, apperror.ErrProjectIsAlreadyExists
 	}
 
 	log.Println(result.InsertedID.(primitive.ObjectID).Hex())
@@ -49,7 +50,7 @@ func (r *ProjectsDatabaseMongo) GetAll(ctx context.Context) ([]model.Project, er
 	cursor, err := r.db.Find(ctx, query)
 	if err != nil {
 		logs.Log().Errorf("Projects are not found in the database %s", err.Error())
-		return []model.Project{}, model.ErrProjectNotFound
+		return []model.Project{}, apperror.ErrProjectNotFound
 	}
 
 	var projects = make([]model.Project, 0)
@@ -58,7 +59,7 @@ func (r *ProjectsDatabaseMongo) GetAll(ctx context.Context) ([]model.Project, er
 
 	if err := cursor.All(ctx, &projects); err != nil {
 		logs.Log().Warn("Error occurred: %s", err.Error())
-		return []model.Project{}, model.ErrProjectNotFound
+		return []model.Project{}, apperror.ErrProjectNotFound
 	}
 
 	return projects, nil
@@ -81,7 +82,7 @@ func (r *ProjectsDatabaseMongo) Delete(ctx context.Context, userId string, proje
 
 	projectObjectId, err := primitive.ObjectIDFromHex(projectId)
 	if err != nil {
-		return model.ErrCouldParseId
+		return apperror.ErrCouldParseId
 	}
 
 	query := bson.M{"user_id": userId, "_id": projectObjectId}
@@ -89,7 +90,7 @@ func (r *ProjectsDatabaseMongo) Delete(ctx context.Context, userId string, proje
 	res, err := r.db.DeleteOne(ctx, &query)
 
 	if res.DeletedCount < 1 {
-		return model.ErrProjectNotFound
+		return apperror.ErrProjectNotFound
 	}
 
 	return err

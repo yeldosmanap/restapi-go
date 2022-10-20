@@ -8,7 +8,6 @@ require (
 	github.com/gofiber/fiber/v2 v2.37.1
 	github.com/gofiber/swagger v0.1.2
 	github.com/golang/mock v1.6.0
-	github.com/joho/godotenv v1.4.0
 	github.com/lib/pq v1.10.7
 	github.com/magiconair/properties v1.8.6
 	github.com/spf13/viper v1.13.0
@@ -17,6 +16,7 @@ require (
 	github.com/swaggo/swag v1.8.6
 	go.mongodb.org/mongo-driver v1.10.2
 	go.uber.org/zap v1.23.0
+	golang.org/x/crypto v0.0.0-20220829220503-c86fa9a7ed90
 )
 
 require (
@@ -58,7 +58,6 @@ require (
 	github.com/youmark/pkcs8 v0.0.0-20201027041543-1326539a0a0a // indirect
 	go.uber.org/atomic v1.10.0 // indirect
 	go.uber.org/multierr v1.8.0 // indirect
-	golang.org/x/crypto v0.0.0-20220829220503-c86fa9a7ed90 // indirect
 	golang.org/x/net v0.0.0-20220921203646-d300de134e69 // indirect
 	golang.org/x/sync v0.0.0-20220907140024-f12130a52804 // indirect
 	golang.org/x/sys v0.0.0-20220919091848-fb04ddd9f9c8 // indirect

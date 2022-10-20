@@ -1,10 +1,12 @@
 package main // Package main
 
 import (
-	"fmt"
+	"context"
 	"log"
 	"os"
 	"os/signal"
+	"syscall"
+	"time"
 
 	"gorest-api/internal/config"
 	"gorest-api/internal/handler"
@@ -14,7 +16,6 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
-	"github.com/joho/godotenv"
 )
 
 // @title           Go REST API
@@ -28,45 +29,53 @@ import (
 // @in header
 // @name Authorization
 func main() {
-	_ = logs.InitLogger()
-
-	fiberConfig := config.FiberConfig()
-
-	err := godotenv.Load()
+	err := logs.InitLogger()
 	if err != nil {
-		log.Fatalf("err loading: %v", err)
+		log.Fatalf("Logger error: %s", err.Error())
 	}
 
-	cfg, err := config.Init("configs")
+	appCfg, err := config.Init("configs")
 	if err != nil {
 		logs.Log().Error(err.Error())
+		os.Exit(1)
 	}
 
-	mongoClient, err := config.NewClient(cfg.Mongo.URI, cfg.Mongo.User, cfg.Mongo.Password)
+	fiberConfig := config.FiberConfig(appCfg)
+
+	var mongoCfg config.MongoConfig
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+
+	mongoClient, err := config.MongoNewClient(ctx, cancel, &mongoCfg)
 	if err != nil {
 		logs.Log().Error(err.Error())
-		return
+		os.Exit(1)
 	}
 
 	app := fiber.New(fiberConfig)
 	app.Use(logger.New())
 
-	mongo := mongoClient.Database(cfg.Mongo.Name)
-	appRepository := repository.NewRepository(mongo)
+	mongoDB := mongoClient.Database(mongoCfg.Name)
+	appRepository := repository.NewRepository(mongoDB)
 	appService := service.NewService(appRepository)
 	appHandler := handler.NewHandler(appService)
 	appHandler.InitRoutesFiber(app)
 
 	c := make(chan os.Signal, 1)
-	signal.Notify(c, os.Interrupt)
+	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 	go func() {
-		fmt.Println("Gracefully shutting down...")
-		_ = app.Shutdown()
+		oscall := <-c
+		logs.Log().Info("Gracefully shutting down... ")
+		logs.Log().Infof("System call: %s", oscall)
+		cancel()
+		if err := app.Shutdown(); err != nil {
+			log.Fatalf("Error when shutting down...")
+		}
 	}()
 
-	if err := app.Listen(":8080"); err != nil {
+	if err := app.Listen(":" + appCfg.HTTP.Port); err != nil {
 		log.Panic(err)
 	}
 
-	fmt.Println("Running cleanup tasks...")
+	logs.Log().Info("Running cleanup tasks...")
 }

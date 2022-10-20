@@ -6,9 +6,10 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 
+	"gorest-api/internal/apperror"
 	"gorest-api/internal/dto"
 	"gorest-api/internal/logs"
-	"gorest-api/internal/utils"
+	"gorest-api/internal/validation"
 )
 
 // @Summary Create a project
@@ -41,25 +42,25 @@ func (h *Handler) createProject(c *fiber.Ctx) error {
 		})
 	}
 
-	input := dto.CreateProjectDto{}
+	input := dto.CreateProjectRequest{}
 	if err := c.BodyParser(&input); err != nil {
 		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{
-			"errors": true,
-			"msg":    "invalid input body",
+			"errors":  true,
+			"message": apperror.ErrBadInputBody,
 		})
 	}
 
 	id, err := h.services.Projects.Create(c.UserContext(), userId, input)
 	if err != nil {
 		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{
-			"errors": true,
-			"msg":    utils.ValidatorErrors(err),
+			"errors":  true,
+			"message": validation.ValidatorErrors(err),
 		})
 	}
 
 	return c.Status(200).JSON(fiber.Map{
 		"errors":    false,
-		"msg":       nil,
+		"message":   nil,
 		"projectId": id,
 	})
 }
@@ -184,7 +185,7 @@ func (h *Handler) updateProject(c *fiber.Ctx) error {
 		})
 	}
 
-	var input dto.UpdateProjectDto
+	var input dto.UpdateProjectRequest
 	projectId := c.Params("id", "")
 
 	if err := c.BodyParser(&input); err != nil {
