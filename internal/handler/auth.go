@@ -5,11 +5,11 @@ import (
 
 	"github.com/go-playground/validator/v10"
 
-	"gorest-api/internal/apperror"
-	"gorest-api/internal/logs"
-	"gorest-api/internal/model"
-
 	"github.com/gofiber/fiber/v2"
+
+	"gorest-api/internal/apperror"
+	"gorest-api/internal/dto"
+	"gorest-api/internal/logs"
 )
 
 // @Summary SignUp
@@ -27,7 +27,7 @@ import (
 func (h *Handler) signUp(c *fiber.Ctx) error {
 	logs.Log().Info("Signing up... ")
 
-	var input model.User
+	var input dto.CreateUser
 	if err := c.BodyParser(&input); err != nil {
 		return c.Status(http.StatusBadRequest).JSON(fiber.Map{
 			"message": apperror.ErrBodyParsed,
@@ -37,7 +37,7 @@ func (h *Handler) signUp(c *fiber.Ctx) error {
 	validate := validator.New()
 	if validationErr := validate.Struct(&input); validationErr != nil {
 		return c.Status(http.StatusBadRequest).JSON(fiber.Map{
-			"message": "invalid input body",
+			"message": apperror.ErrBadInputBody,
 		})
 	}
 
@@ -74,14 +74,15 @@ func (h *Handler) signIn(c *fiber.Ctx) error {
 	logs.Log().Info("Signing in...")
 
 	var input signInInput
-
 	if err := c.BodyParser(&input); err != nil {
-		return c.Status(http.StatusBadRequest).JSON(fiber.Map{"message": apperror.ErrBodyParsed})
+		return c.Status(http.StatusBadRequest).JSON(fiber.Map{
+			"message": apperror.ErrBodyParsed})
 	}
 
 	token, err := h.services.Authorization.GenerateToken(c.UserContext(), input.Email, input.Password)
 	if err != nil {
-		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"message": err.Error()})
+		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{
+			"message": err.Error()})
 	}
 
 	return c.Status(http.StatusOK).JSON(fiber.Map{"token": token})

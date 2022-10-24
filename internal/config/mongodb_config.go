@@ -3,7 +3,6 @@ package config
 import (
 	"context"
 	"errors"
-	"time"
 
 	"github.com/spf13/viper"
 
@@ -12,8 +11,6 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
-
-const timeout = 10 * time.Second
 
 type MongoConfig struct {
 	URI      string `mapstructure:"mongoURI"`

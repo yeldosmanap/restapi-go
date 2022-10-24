@@ -1,11 +1,12 @@
 package handler
 
 import (
-	"errors"
 	"net/http"
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
+
+	"gorest-api/internal/apperror"
 )
 
 const (
@@ -39,7 +40,7 @@ func (h *Handler) userIdentity(c *fiber.Ctx) error {
 	userId, err := h.services.Authorization.ParseToken(headerParts[1])
 	if err != nil {
 		return c.Status(http.StatusUnauthorized).JSON(fiber.Map{
-			"message": err.Error(),
+			"message": "token parsing error",
 		})
 	}
 
@@ -51,7 +52,7 @@ func getUserId(c *fiber.Ctx) (string, error) {
 	id := c.GetRespHeader(userCtx, "")
 
 	if len(id) == 0 {
-		return "", errors.New("user id not found")
+		return "", apperror.ErrUserIdNotFound
 	}
 
 	return id, nil

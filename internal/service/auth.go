@@ -7,6 +7,7 @@ import (
 
 	"golang.org/x/crypto/bcrypt"
 
+	"gorest-api/internal/dto"
 	"gorest-api/internal/logs"
 
 	"github.com/dgrijalva/jwt-go"
@@ -33,10 +34,14 @@ func NewAuthService(repo repository.Authorization) *AuthService {
 	return &AuthService{repo: repo}
 }
 
-func (s *AuthService) CreateUser(ctx context.Context, user model.User) (string, error) {
+func (s *AuthService) CreateUser(ctx context.Context, userDto dto.CreateUser) (string, error) {
 	logs.Log().Info("Creating a user...")
 
-	user.Password = generatePasswordHash(user.Password)
+	user := model.User{
+		Name:     userDto.Name,
+		Email:    userDto.Email,
+		Password: generatePasswordHash(userDto.Password),
+	}
 
 	return s.repo.CreateUser(ctx, user)
 }

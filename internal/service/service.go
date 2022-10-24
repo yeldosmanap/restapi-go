@@ -13,13 +13,13 @@ import (
 //go:generate mockgen -source=service.go -destination=mocks/mock.go
 
 type Authorization interface {
-	CreateUser(ctx context.Context, user model.User) (string, error)
+	CreateUser(ctx context.Context, dto dto.CreateUser) (string, error)
 	GenerateToken(ctx context.Context, email, password string) (string, error)
 	ParseToken(token string) (string, error)
 }
 
 type Projects interface {
-	Create(ctx context.Context, userId string, dto dto.CreateProjectRequest) (string, error)
+	Create(ctx context.Context, userId string, dto dto.CreateProject) (string, error)
 	Update(ctx context.Context, userId string, projectId string, newTitle string) error
 	Delete(ctx context.Context, userId string, projectId string) error
 	GetByTitle(ctx context.Context, userId string, title string) (model.Project, error)

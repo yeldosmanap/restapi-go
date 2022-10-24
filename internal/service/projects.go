@@ -16,7 +16,7 @@ func NewProjectsService(repo repository.Projects) *ProjectsService {
 	return &ProjectsService{repo: repo}
 }
 
-func (s *ProjectsService) Create(ctx context.Context, userId string, dto dto.CreateProjectRequest) (string, error) {
+func (s *ProjectsService) Create(ctx context.Context, userId string, dto dto.CreateProject) (string, error) {
 	project := model.Project{
 		Title:    dto.Title,
 		UserID:   userId,

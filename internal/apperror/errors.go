@@ -15,4 +15,6 @@ const (
 	ErrProjectIsAlreadyExists = Error("this project is already exists")
 	ErrCouldParseId           = Error("ID of users is not in correct format")
 	ErrBadInputBody           = Error("invalid input body")
+	ErrUserIdNotFound         = Error("user id not found")
+	ErrParameterNotFound      = Error("parameter not found")
 )

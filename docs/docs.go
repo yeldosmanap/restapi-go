@@ -443,7 +443,8 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "title": {
-                    "type": "string"
+                    "type": "string",
+                    "minLength": 2
                 }
             }
         },

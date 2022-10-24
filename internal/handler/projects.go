@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 
 	"gorest-api/internal/apperror"
@@ -34,7 +35,6 @@ func (h *Handler) createProject(c *fiber.Ctx) error {
 	}
 
 	userId, err := getUserId(c)
-
 	if err != nil {
 		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{
 			"errors":  true,
@@ -42,7 +42,7 @@ func (h *Handler) createProject(c *fiber.Ctx) error {
 		})
 	}
 
-	input := dto.CreateProjectRequest{}
+	input := dto.CreateProject{}
 	if err := c.BodyParser(&input); err != nil {
 		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{
 			"errors":  true,
@@ -50,11 +50,19 @@ func (h *Handler) createProject(c *fiber.Ctx) error {
 		})
 	}
 
+	validate := validator.New()
+	if err := validate.Struct(input); err != nil {
+		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{
+			"errors":  true,
+			"message": validation.ValidatorErrors(err),
+		})
+	}
+
 	id, err := h.services.Projects.Create(c.UserContext(), userId, input)
 	if err != nil {
 		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{
 			"errors":  true,
-			"message": validation.ValidatorErrors(err),
+			"message": err.Error(),
 		})
 	}
 
@@ -85,17 +93,7 @@ func (h *Handler) getAllProjects(c *fiber.Ctx) error {
 		return err
 	}
 
-	// userId, err := getUserId(c)
-
-	// if err != nil {
-	//	return c.Status(http.StatusInternalServerError).JSON(fiber.Map{
-	//		"errors":   true,
-	//		"message": utils.ValidatorErrors(err),
-	//	})
-	// }
-
 	projects, err := h.services.Projects.GetAll(c.UserContext())
-
 	if err != nil {
 		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{
 			"errors":  true,
@@ -141,7 +139,13 @@ func (h *Handler) getProjectByTitle(c *fiber.Ctx) error {
 		})
 	}
 
-	title := c.Params("title")
+	title := c.Params("title", "")
+	if title == "" {
+		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{
+			"errors":  true,
+			"message": apperror.ErrParameterNotFound,
+		})
+	}
 
 	project, err := h.services.Projects.GetByTitle(c.UserContext(), userId, title)
 	if err != nil {
@@ -177,7 +181,6 @@ func (h *Handler) updateProject(c *fiber.Ctx) error {
 	}
 
 	userId, err := getUserId(c)
-
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"errors":  true,
@@ -185,13 +188,27 @@ func (h *Handler) updateProject(c *fiber.Ctx) error {
 		})
 	}
 
-	var input dto.UpdateProjectRequest
+	var input dto.UpdateProject
 	projectId := c.Params("id", "")
+	if projectId == "" {
+		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{
+			"errors":  true,
+			"message": apperror.ErrParameterNotFound,
+		})
+	}
 
 	if err := c.BodyParser(&input); err != nil {
 		return c.Status(http.StatusBadRequest).JSON(fiber.Map{
 			"errors":  true,
-			"message": err.Error(),
+			"message": apperror.ErrBodyParsed,
+		})
+	}
+
+	validate := validator.New()
+	if err := validate.Struct(input); err != nil {
+		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{
+			"errors":  true,
+			"message": validation.ValidatorErrors(err),
 		})
 	}
 
@@ -223,7 +240,6 @@ func (h *Handler) deleteProject(c *fiber.Ctx) error {
 	}
 
 	userId, err := getUserId(c)
-
 	if err != nil {
 		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{
 			"errors":  true,
@@ -235,7 +251,7 @@ func (h *Handler) deleteProject(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(http.StatusBadRequest).JSON(fiber.Map{
 			"errors":  true,
-			"message": err.Error(),
+			"message": apperror.ErrParameterNotFound,
 		})
 	}
 

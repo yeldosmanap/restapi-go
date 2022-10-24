@@ -17,6 +17,7 @@ definitions:
       id:
         type: string
       title:
+        minLength: 2
         type: string
     type: object
   model.User:

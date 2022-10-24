@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"log"
 
 	"gorest-api/internal/apperror"
 	"gorest-api/internal/config"
@@ -34,8 +33,6 @@ func (r *ProjectsDatabaseMongo) Create(ctx context.Context, project model.Projec
 		id := primitive.NilObjectID.Hex()
 		return id, apperror.ErrProjectIsAlreadyExists
 	}
-
-	log.Println(result.InsertedID.(primitive.ObjectID).Hex())
 
 	id := result.InsertedID.(primitive.ObjectID).Hex()
 
