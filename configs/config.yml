@@ -6,14 +6,12 @@ http:
   host: localhost
 
 mongo:
-    databaseName: gorest
-    mongoURI: mongodb+srv://yeldosmanap:1245emer@cluster0.ax3nacu.mongodb.net/?retryWrites=true&w=majority
-    mongoPassword: 1245emer
-    mongoUsername: yeldosmanap
+  databaseName: gorest
+  mongoURI: mongodb+srv://yeldosmanap:1245emer@cluster0.ax3nacu.mongodb.net/?retryWrites=true&w=majority
+  mongoPassword: 1245emer
+  mongoUsername: yeldosmanap
 
 auth:
   accessTokenTTL: 2h
   refreshTokenTTL: 720h
   verificationCodeLength: 8
-  passwordSalt: dsfasdzxvkvlm23142;l1r
-  jwtSigningKey: secret

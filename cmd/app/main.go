@@ -2,17 +2,19 @@ package main // Package main
 
 import (
 	"context"
+	"errors"
 	"log"
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
 
-	"gorest-api/internal/config"
-	"gorest-api/internal/handler"
-	"gorest-api/internal/logs"
-	"gorest-api/internal/repository"
-	"gorest-api/internal/service"
+	"gorestapi/internal/config"
+	"gorestapi/internal/handler"
+	"gorestapi/internal/logs"
+	"gorestapi/internal/repository"
+	"gorestapi/internal/service"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
@@ -61,21 +63,40 @@ func main() {
 	appHandler := handler.NewHandler(appService)
 	appHandler.InitRoutesFiber(app)
 
-	c := make(chan os.Signal, 1)
-	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
-	go func() {
-		oscall := <-c
-		logs.Log().Info("Gracefully shutting down... ")
-		logs.Log().Infof("System call: %s", oscall)
-		cancel()
-		if err := app.Shutdown(); err != nil {
-			log.Fatalf("Error when shutting down...")
-		}
-	}()
+	go start(app, appCfg.HTTP.Port)
 
-	if err := app.Listen(":" + appCfg.HTTP.Port); err != nil {
-		log.Panic(err)
+	stopChannel, closeChannel := createChannel()
+	defer closeChannel()
+
+	logs.Log().Info("Notified ", <-stopChannel)
+	shutdown(ctx, app)
+}
+
+func start(server *fiber.App, port string) {
+	logs.Log().Info("Application started")
+	if err := server.Listen(":" + port); err != nil && !errors.Is(err, http.ErrServerClosed) {
+		panic(err)
+	} else {
+		logs.Log().Info("application stopped gracefully")
 	}
+}
 
-	logs.Log().Info("Running cleanup tasks...")
+func createChannel() (chan os.Signal, func()) {
+	stopChannel := make(chan os.Signal, 1)
+	signal.Notify(stopChannel, os.Interrupt, syscall.SIGTERM, syscall.SIGINT)
+
+	return stopChannel, func() {
+		close(stopChannel)
+	}
+}
+
+func shutdown(ctx context.Context, app *fiber.App) {
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+
+	if err := app.Shutdown(); err != nil {
+		panic(err)
+	} else {
+		logs.Log().Info("Application shutdown")
+	}
 }

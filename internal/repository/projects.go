@@ -3,10 +3,10 @@ package repository
 import (
 	"context"
 
-	"gorest-api/internal/apperror"
-	"gorest-api/internal/config"
-	"gorest-api/internal/logs"
-	"gorest-api/internal/model"
+	"gorestapi/internal/apperror"
+	"gorestapi/internal/config"
+	"gorestapi/internal/logs"
+	"gorestapi/internal/model"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"

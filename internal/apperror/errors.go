@@ -17,4 +17,5 @@ const (
 	ErrBadInputBody           = Error("invalid input body")
 	ErrUserIdNotFound         = Error("user id not found")
 	ErrParameterNotFound      = Error("parameter not found")
+	ErrBadCredentials         = Error("bad connection credentials")
 )

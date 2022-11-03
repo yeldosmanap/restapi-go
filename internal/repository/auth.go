@@ -9,9 +9,9 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 
-	"gorest-api/internal/apperror"
-	"gorest-api/internal/logs"
-	"gorest-api/internal/model"
+	"gorestapi/internal/apperror"
+	"gorestapi/internal/logs"
+	"gorestapi/internal/model"
 )
 
 type AuthPostgres struct {

@@ -7,10 +7,10 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 
-	"gorest-api/internal/apperror"
-	"gorest-api/internal/dto"
-	"gorest-api/internal/logs"
-	"gorest-api/internal/validation"
+	"gorestapi/internal/apperror"
+	"gorestapi/internal/dto"
+	"gorestapi/internal/logs"
+	"gorestapi/internal/validation"
 )
 
 // @Summary Create a project

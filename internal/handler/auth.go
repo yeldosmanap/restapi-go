@@ -7,9 +7,9 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 
-	"gorest-api/internal/apperror"
-	"gorest-api/internal/dto"
-	"gorest-api/internal/logs"
+	"gorestapi/internal/apperror"
+	"gorestapi/internal/dto"
+	"gorestapi/internal/logs"
 )
 
 // @Summary SignUp

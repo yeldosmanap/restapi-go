@@ -7,13 +7,12 @@ import (
 
 	"golang.org/x/crypto/bcrypt"
 
-	"gorest-api/internal/dto"
-	"gorest-api/internal/logs"
+	"gorestapi/internal/dto"
+	"gorestapi/internal/logs"
+	"gorestapi/internal/model"
+	"gorestapi/internal/repository"
 
-	"github.com/dgrijalva/jwt-go"
-
-	"gorest-api/internal/model"
-	"gorest-api/internal/repository"
+	"github.com/golang-jwt/jwt/v4"
 )
 
 const (
@@ -22,8 +21,9 @@ const (
 )
 
 type tokenClaims struct {
-	jwt.StandardClaims
-	UserId string `json:"user_id"`
+	jwt.RegisteredClaims
+	UserId    string `json:"user_id"`
+	UserEmail string `json:"user_email"`
 }
 
 type AuthService struct {
@@ -56,11 +56,12 @@ func (s *AuthService) GenerateToken(ctx context.Context, email, password string)
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &tokenClaims{
-		jwt.StandardClaims{
-			ExpiresAt: time.Now().Add(tokenTTL).Unix(),
-			IssuedAt:  time.Now().Unix(),
+		jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(tokenTTL)),
+			IssuedAt:  jwt.NewNumericDate(time.Now()),
 		},
 		user.Id,
+		user.Email,
 	})
 
 	return token.SignedString([]byte(signingKey))

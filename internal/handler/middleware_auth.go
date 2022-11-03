@@ -6,7 +6,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 
-	"gorest-api/internal/apperror"
+	"gorestapi/internal/apperror"
 )
 
 const (

@@ -18,9 +18,7 @@ type (
 	}
 
 	AuthConfig struct {
-		JWT                    JWTConfig
-		PasswordSalt           string `mapstructure:"passwordSalt"`
-		VerificationCodeLength int    `mapstructure:"verificationCodeLength"`
+		JWT JWTConfig
 	}
 
 	JWTConfig struct {

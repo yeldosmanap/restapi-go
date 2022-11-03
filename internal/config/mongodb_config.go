@@ -6,7 +6,8 @@ import (
 
 	"github.com/spf13/viper"
 
-	"gorest-api/internal/logs"
+	"gorestapi/internal/apperror"
+	"gorestapi/internal/logs"
 
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -15,7 +16,7 @@ import (
 type MongoConfig struct {
 	URI      string `mapstructure:"mongoURI"`
 	Username string `mapstructure:"mongoUsername"`
-	Password string `mapstructure:"mongoUrPassword"`
+	Password string `mapstructure:"mongoPassword"`
 	Name     string `mapstructure:"databaseName"`
 }
 
@@ -36,6 +37,8 @@ func MongoNewClient(ctx context.Context, cancel context.CancelFunc, mongoCfg *Mo
 				Username: mongoCfg.Username,
 				Password: mongoCfg.Password,
 			})
+	} else {
+		return nil, apperror.ErrBadCredentials
 	}
 
 	logs.Log().Info("Enabling new mongodb client")
@@ -44,16 +47,16 @@ func MongoNewClient(ctx context.Context, cancel context.CancelFunc, mongoCfg *Mo
 		return nil, err
 	}
 
+	defer cancel()
+
 	logs.Log().Info("Connecting to the database")
 	err = client.Connect(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	defer cancel()
-
 	logs.Log().Info("Pinging the database")
-	err = client.Ping(context.Background(), nil)
+	err = client.Ping(ctx, nil)
 	if err != nil {
 		return nil, err
 	}

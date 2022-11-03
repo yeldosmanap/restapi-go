@@ -5,7 +5,7 @@ import (
 
 	"go.mongodb.org/mongo-driver/mongo"
 
-	"gorest-api/internal/model"
+	"gorestapi/internal/model"
 )
 
 type Authorization interface {

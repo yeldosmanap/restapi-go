@@ -3,9 +3,9 @@ package service
 import (
 	"context"
 
-	"gorest-api/internal/dto"
-	"gorest-api/internal/model"
-	"gorest-api/internal/repository"
+	"gorestapi/internal/dto"
+	"gorestapi/internal/model"
+	"gorestapi/internal/repository"
 )
 
 type ProjectsService struct {

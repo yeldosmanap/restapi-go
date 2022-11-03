@@ -4,8 +4,8 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/swagger"
 
-	"gorest-api/docs"
-	"gorest-api/internal/service"
+	"gorestapi/docs"
+	"gorestapi/internal/service"
 
 	_ "github.com/swaggo/files"
 )

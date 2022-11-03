@@ -5,9 +5,9 @@ import (
 
 	_ "github.com/golang/mock/gomock"
 
-	"gorest-api/internal/dto"
-	"gorest-api/internal/model"
-	"gorest-api/internal/repository"
+	"gorestapi/internal/dto"
+	"gorestapi/internal/model"
+	"gorestapi/internal/repository"
 )
 
 //go:generate mockgen -source=service.go -destination=mocks/mock.go
