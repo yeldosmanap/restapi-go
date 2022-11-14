@@ -1,8 +1,10 @@
 package handler
 
 import (
+	"github.com/gofiber/adaptor/v2"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/swagger"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 
 	"gorestapi/docs"
 	"gorestapi/internal/service"
@@ -40,6 +42,12 @@ func (h *Handler) InitRoutesFiber(app *fiber.App) *fiber.App {
 	}
 
 	app.Get("/swagger/*", swagger.HandlerDefault)
+
+	return app
+}
+
+func (h *Handler) InitPrometheusRoutes(app *fiber.App) *fiber.App {
+	app.Get("/api/v1/metrics", adaptor.HTTPHandler(promhttp.Handler()))
 
 	return app
 }

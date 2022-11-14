@@ -1,4 +1,4 @@
-package main // Package main
+package main
 
 import (
 	"context"
@@ -13,6 +13,7 @@ import (
 	"gorestapi/internal/config"
 	"gorestapi/internal/handler"
 	"gorestapi/internal/logs"
+	"gorestapi/internal/middlewares"
 	"gorestapi/internal/repository"
 	"gorestapi/internal/service"
 
@@ -58,9 +59,16 @@ func main() {
 	app.Use(logger.New())
 
 	mongoDB := mongoClient.Database(mongoCfg.Name)
+
 	appRepository := repository.NewRepository(mongoDB)
 	appService := service.NewService(appRepository)
 	appHandler := handler.NewHandler(appService)
+
+	prometheusInstance := middlewares.New("restapi-go")
+	prometheusInstance.RegisterAt(app, "/api/v1/metrics")
+
+	app.Use(prometheusInstance.Middleware)
+
 	appHandler.InitRoutesFiber(app)
 
 	go start(app, appCfg.HTTP.Port)

@@ -26,7 +26,7 @@ func (h *Handler) userIdentity(c *fiber.Ctx) error {
 	headerParts := strings.Split(header, " ")
 
 	if len(headerParts) != 2 || headerParts[0] != "Bearer" {
-		c.Status(http.StatusUnauthorized).JSON(fiber.Map{
+		return c.Status(http.StatusUnauthorized).JSON(fiber.Map{
 			"message": "invalid auth header",
 		})
 	}
