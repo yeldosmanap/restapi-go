@@ -21,6 +21,11 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/logger"
 )
 
+const (
+	configsDirectory      = "configs"
+	contextTimeoutSeconds = 10
+)
+
 // @title           Go REST API
 // @version         1.0
 // @description Projects REST API for Go.
@@ -32,24 +37,30 @@ import (
 // @in header
 // @name Authorization
 func main() {
+	// Initializing a sugared logger
 	err := logs.InitLogger()
 	if err != nil {
 		log.Fatalf("Logger error: %s", err.Error())
 	}
 
-	appCfg, err := config.Init("configs")
+	// Initializing the application configuration
+	appConfig, err := config.Init(configsDirectory)
 	if err != nil {
 		logs.Log().Error(err.Error())
 		os.Exit(1)
 	}
 
-	fiberConfig := config.FiberConfig(appCfg)
+	// Initializing fiber configuration
+	fiberConfig := config.FiberConfig(appConfig)
 
-	var mongoCfg config.MongoConfig
+	// Declaring mongodb configuration
+	var mongoConfig config.MongoConfig
 
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	// Declaring a context with timeout
+	ctx, cancel := context.WithTimeout(context.Background(), contextTimeoutSeconds*time.Second)
 
-	mongoClient, err := config.MongoNewClient(ctx, cancel, &mongoCfg)
+	// Initializing mongo db client
+	mongoClient, err := config.MongoNewClient(ctx, cancel, &mongoConfig)
 	if err != nil {
 		logs.Log().Error(err.Error())
 		os.Exit(1)
@@ -58,7 +69,7 @@ func main() {
 	app := fiber.New(fiberConfig)
 	app.Use(logger.New())
 
-	mongoDB := mongoClient.Database(mongoCfg.Name)
+	mongoDB := mongoClient.Database(mongoConfig.Name)
 
 	appRepository := repository.NewRepository(mongoDB)
 	appService := service.NewService(appRepository)
@@ -71,7 +82,7 @@ func main() {
 
 	appHandler.InitRoutesFiber(app)
 
-	go start(app, appCfg.HTTP.Port)
+	go start(app, appConfig.HTTP.Port)
 
 	stopChannel, closeChannel := createChannel()
 	defer closeChannel()
@@ -99,7 +110,7 @@ func createChannel() (chan os.Signal, func()) {
 }
 
 func shutdown(ctx context.Context, app *fiber.App) {
-	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	ctx, cancel := context.WithTimeout(ctx, contextTimeoutSeconds*time.Second)
 	defer cancel()
 
 	if err := app.Shutdown(); err != nil {

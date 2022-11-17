@@ -6,8 +6,8 @@ package mock_service
 
 import (
 	context "context"
-	dto "go-rest-api/internal/dto"
-	model "go-rest-api/internal/model"
+	dto "gorestapi/internal/dto"
+	model "gorestapi/internal/model"
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
@@ -37,18 +37,18 @@ func (m *MockAuthorization) EXPECT() *MockAuthorizationMockRecorder {
 }
 
 // CreateUser mocks base method.
-func (m *MockAuthorization) CreateUser(ctx context.Context, user model.User) (string, error) {
+func (m *MockAuthorization) CreateUser(ctx context.Context, dto dto.CreateUser) (string, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateUser", ctx, user)
+	ret := m.ctrl.Call(m, "CreateUser", ctx, dto)
 	ret0, _ := ret[0].(string)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // CreateUser indicates an expected call of CreateUser.
-func (mr *MockAuthorizationMockRecorder) CreateUser(ctx, user interface{}) *gomock.Call {
+func (mr *MockAuthorizationMockRecorder) CreateUser(ctx, dto interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateUser", reflect.TypeOf((*MockAuthorization)(nil).CreateUser), ctx, user)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateUser", reflect.TypeOf((*MockAuthorization)(nil).CreateUser), ctx, dto)
 }
 
 // GenerateToken mocks base method.
@@ -105,32 +105,32 @@ func (m *MockProjects) EXPECT() *MockProjectsMockRecorder {
 }
 
 // Create mocks base method.
-func (m *MockProjects) Create(ctx context.Context, userId string, dto dto.CreateProjectDto) (string, error) {
+func (m *MockProjects) Create(ctx context.Context, userID string, dto dto.CreateProject) (string, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Create", ctx, userId, dto)
+	ret := m.ctrl.Call(m, "Create", ctx, userID, dto)
 	ret0, _ := ret[0].(string)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // Create indicates an expected call of Create.
-func (mr *MockProjectsMockRecorder) Create(ctx, userId, dto interface{}) *gomock.Call {
+func (mr *MockProjectsMockRecorder) Create(ctx, userID, dto interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockProjects)(nil).Create), ctx, userId, dto)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockProjects)(nil).Create), ctx, userID, dto)
 }
 
 // Delete mocks base method.
-func (m *MockProjects) Delete(ctx context.Context, userId, projectId string) error {
+func (m *MockProjects) Delete(ctx context.Context, userID, projectId string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Delete", ctx, userId, projectId)
+	ret := m.ctrl.Call(m, "Delete", ctx, userID, projectId)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // Delete indicates an expected call of Delete.
-func (mr *MockProjectsMockRecorder) Delete(ctx, userId, projectId interface{}) *gomock.Call {
+func (mr *MockProjectsMockRecorder) Delete(ctx, userID, projectId interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockProjects)(nil).Delete), ctx, userId, projectId)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockProjects)(nil).Delete), ctx, userID, projectId)
 }
 
 // GetAll mocks base method.
@@ -149,30 +149,30 @@ func (mr *MockProjectsMockRecorder) GetAll(ctx interface{}) *gomock.Call {
 }
 
 // GetByTitle mocks base method.
-func (m *MockProjects) GetByTitle(ctx context.Context, userId, title string) (model.Project, error) {
+func (m *MockProjects) GetByTitle(ctx context.Context, userID, title string) (model.Project, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetByTitle", ctx, userId, title)
+	ret := m.ctrl.Call(m, "GetByTitle", ctx, userID, title)
 	ret0, _ := ret[0].(model.Project)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetByTitle indicates an expected call of GetByTitle.
-func (mr *MockProjectsMockRecorder) GetByTitle(ctx, userId, title interface{}) *gomock.Call {
+func (mr *MockProjectsMockRecorder) GetByTitle(ctx, userID, title interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByTitle", reflect.TypeOf((*MockProjects)(nil).GetByTitle), ctx, userId, title)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByTitle", reflect.TypeOf((*MockProjects)(nil).GetByTitle), ctx, userID, title)
 }
 
 // Update mocks base method.
-func (m *MockProjects) Update(ctx context.Context, userId, projectId, newTitle string) error {
+func (m *MockProjects) Update(ctx context.Context, userID, projectId, newTitle string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Update", ctx, userId, projectId, newTitle)
+	ret := m.ctrl.Call(m, "Update", ctx, userID, projectId, newTitle)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // Update indicates an expected call of Update.
-func (mr *MockProjectsMockRecorder) Update(ctx, userId, projectId, newTitle interface{}) *gomock.Call {
+func (mr *MockProjectsMockRecorder) Update(ctx, userID, projectId, newTitle interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockProjects)(nil).Update), ctx, userId, projectId, newTitle)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockProjects)(nil).Update), ctx, userID, projectId, newTitle)
 }

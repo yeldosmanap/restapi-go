@@ -2,11 +2,11 @@ package service
 
 import (
 	"context"
-	"errors"
 	"time"
 
 	"golang.org/x/crypto/bcrypt"
 
+	"gorestapi/internal/apperror"
 	"gorestapi/internal/dto"
 	"gorestapi/internal/logs"
 	"gorestapi/internal/model"
@@ -60,7 +60,7 @@ func (s *AuthService) GenerateToken(ctx context.Context, email, password string)
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(tokenTTL)),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
 		},
-		user.Id,
+		user.ID,
 		user.Email,
 	})
 
@@ -70,18 +70,19 @@ func (s *AuthService) GenerateToken(ctx context.Context, email, password string)
 func (s *AuthService) ParseToken(accessToken string) (string, error) {
 	token, err := jwt.ParseWithClaims(accessToken, &tokenClaims{}, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, errors.New("invalid signing method")
+			return nil, apperror.ErrBadSigningMethod
 		}
 
 		return []byte(signingKey), nil
 	})
+
 	if err != nil {
 		return "", err
 	}
 
 	claims, ok := token.Claims.(*tokenClaims)
 	if !ok {
-		return "", errors.New("token claims are not of type *tokenClaims")
+		return "", apperror.ErrBadClaimsType
 	}
 
 	return claims.UserId, nil
@@ -90,7 +91,7 @@ func (s *AuthService) ParseToken(accessToken string) (string, error) {
 func generatePasswordHash(password string) string {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
-		logs.Log().Fatalf("Error occured when generating a hash of a password")
+		logs.Log().Fatalf("Error occurred when generating a hash of a password")
 	}
 
 	return string(bytes)

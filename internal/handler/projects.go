@@ -29,11 +29,6 @@ import (
 func (h *Handler) createProject(c *fiber.Ctx) error {
 	log.Println("Creating a project... ")
 
-	err := h.userIdentity(c)
-	if err != nil {
-		return err
-	}
-
 	userId, err := getUserId(c)
 	if err != nil {
 		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{
@@ -88,9 +83,12 @@ func (h *Handler) createProject(c *fiber.Ctx) error {
 func (h *Handler) getAllProjects(c *fiber.Ctx) error {
 	logs.Log().Info("Getting all projects... ")
 
-	err := h.userIdentity(c)
+	_, err := getUserId(c)
 	if err != nil {
-		return err
+		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{
+			"errors":  true,
+			"message": err.Error(),
+		})
 	}
 
 	projects, err := h.services.Projects.GetAll(c.UserContext())
@@ -125,13 +123,7 @@ func (h *Handler) getAllProjects(c *fiber.Ctx) error {
 func (h *Handler) getProjectByTitle(c *fiber.Ctx) error {
 	logs.Log().Info("Getting a project by title... ")
 
-	err := h.userIdentity(c)
-	if err != nil {
-		return err
-	}
-
 	userId, err := getUserId(c)
-
 	if err != nil {
 		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{
 			"errors":  true,
@@ -174,11 +166,6 @@ func (h *Handler) getProjectByTitle(c *fiber.Ctx) error {
 // @Router /api/v1/projects/:id [put]
 func (h *Handler) updateProject(c *fiber.Ctx) error {
 	log.Println("Updating a project... ")
-
-	err := h.userIdentity(c)
-	if err != nil {
-		return err
-	}
 
 	userId, err := getUserId(c)
 	if err != nil {
@@ -234,10 +221,7 @@ func (h *Handler) updateProject(c *fiber.Ctx) error {
 // @Failure default {object} map[string]interface{}
 // @Router /api/v1/projects/:id [delete]
 func (h *Handler) deleteProject(c *fiber.Ctx) error {
-	err := h.userIdentity(c)
-	if err != nil {
-		return err
-	}
+	logs.Log().Info("Deleting a project")
 
 	userId, err := getUserId(c)
 	if err != nil {

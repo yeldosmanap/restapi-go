@@ -45,14 +45,13 @@ func (h *Handler) userIdentity(c *fiber.Ctx) error {
 	}
 
 	c.Set(userCtx, userId)
-	return err
+	return c.Next()
 }
 
 func getUserId(c *fiber.Ctx) (string, error) {
 	id := c.GetRespHeader(userCtx, "")
-
 	if len(id) == 0 {
-		return "", apperror.ErrUserIdNotFound
+		return "", apperror.ErrUserIDNotFound
 	}
 
 	return id, nil

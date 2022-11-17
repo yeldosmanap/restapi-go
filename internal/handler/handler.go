@@ -3,6 +3,7 @@ package handler
 import (
 	"github.com/gofiber/adaptor/v2"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/swagger"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 
@@ -31,7 +32,7 @@ func (h *Handler) InitRoutesFiber(app *fiber.App) *fiber.App {
 
 	rest := app.Group("/api/v1")
 	{
-		projects := rest.Group("/projects")
+		projects := rest.Group("/projects", logger.New(), h.userIdentity)
 		{
 			projects.Post("/", h.createProject)
 			projects.Get("/", h.getAllProjects)

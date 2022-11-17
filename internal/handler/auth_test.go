@@ -5,17 +5,16 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"github.com/gofiber/fiber/v2"
-	"go-rest-api/internal/logs"
 	"io"
 	"net/http/httptest"
 	"testing"
 
-	"go-rest-api/internal/model"
-	"go-rest-api/internal/service"
+	"gorestapi/internal/logs"
+	"gorestapi/internal/model"
+	"gorestapi/internal/service"
+	mockService "gorestapi/internal/service/mocks"
 
-	mockService "go-rest-api/internal/service/mocks"
-
+	"github.com/gofiber/fiber/v2"
 	"github.com/golang/mock/gomock"
 	"github.com/magiconair/properties/assert"
 )

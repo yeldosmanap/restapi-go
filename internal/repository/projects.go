@@ -79,7 +79,7 @@ func (r *ProjectsDatabaseMongo) Delete(ctx context.Context, userId string, proje
 
 	projectObjectId, err := primitive.ObjectIDFromHex(projectId)
 	if err != nil {
-		return apperror.ErrCouldParseId
+		return apperror.ErrCouldParseID
 	}
 
 	query := bson.M{"user_id": userId, "_id": projectObjectId}
