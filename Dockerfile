@@ -21,7 +21,6 @@ WORKDIR /root/
 
 COPY --from=builder /github.com/yeldosmanap/restapi-go/.bin/app .
 COPY --from=builder /github.com/yeldosmanap/restapi-go/.env ./.env
-COPY --from=builder /github.com/yeldosmanap/restapi-go/.github/workflows ./.github/workflows
 COPY --from=builder /github.com/yeldosmanap/restapi-go/configs ./configs/
 COPY --from=builder /github.com/yeldosmanap/restapi-go/prometheus ./prometheus/
 
