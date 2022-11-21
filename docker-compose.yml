@@ -29,7 +29,7 @@ services:
     volumes:
       - ./prometheus:/etc/prometheus/
     command:
-      - '--config.file=/etc/configs/prometheus.yml'
+      - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
     ports:
       - 9090:9090
@@ -40,11 +40,13 @@ services:
     image: grafana/grafana:latest
     ports:
       - 3000:3000
-    depends_on: prometheus
+    depends_on:
+      - prometheus
 
 volumes:
   app:
   mongo:
+  prometheus:
 
 networks:
   cloud:

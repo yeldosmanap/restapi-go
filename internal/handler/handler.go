@@ -24,12 +24,14 @@ func NewHandler(services *service.Service) *Handler {
 func (h *Handler) InitRoutesFiber(app *fiber.App) *fiber.App {
 	docs.SwaggerInfo.BasePath = "/"
 
+	// Define auth routes
 	auth := app.Group("/auth")
 	{
 		auth.Post("sign-up", h.signUp)
 		auth.Post("sign-in", h.signIn)
 	}
 
+	// Define API routes
 	rest := app.Group("/api/v1")
 	{
 		projects := rest.Group("/projects", logger.New(), h.userIdentity)
