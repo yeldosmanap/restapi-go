@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  app:
+    container_name: rest-app
+    build: ./
+    ports:
+      - 8080:8080
+    depends_on:
+      - mongo
+    volumes:
+      - app:/usr/src/app/
+    environment:
+      - DB_PASSWORD=1245emer
+    networks:
+      - cloud
+
+  mongo:
+    image: mongo:latest
+    restart: always
+    container_name: mongodb
+    volumes:
+      - ./mongo:/data/db
+    ports:
+      - 27017:27017
+
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ./prometheus:/etc/prometheus/
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+    ports:
+      - 9090:9090
+    depends_on:
+      - app
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - 3000:3000
+    depends_on:
+      - prometheus
+
+volumes:
+  app:
+  mongo:
+  prometheus:
+
+networks:
+  cloud:
+    driver: bridge

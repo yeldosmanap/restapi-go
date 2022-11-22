@@ -1,0 +1,5 @@
+.idea
+.database
+.DS_Store
+.configs/
+.mongo/

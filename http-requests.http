@@ -1,0 +1,38 @@
+###
+GET localhost:8080/api/projects
+
+
+###
+POST localhost:8080/projects
+Content-Type: application/json
+
+{
+  "title": "first"
+}
+
+###
+POST localhost:8080/projects
+Content-Type: application/json
+
+{
+  "title": "second"
+}
+
+###
+GET localhost:8080/projects/first
+
+###
+PUT localhost:8080/projects/first
+
+{
+  "new_title": "another"
+}
+
+###
+DELETE localhost:8080/projects/second
+
+###
+PUT localhost:8080/projects/first/archive
+
+###
+DELETE localhost:8080/projects/first/archive
